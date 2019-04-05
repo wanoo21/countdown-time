@@ -6,9 +6,9 @@ Create a flexible and powerfull countdown to any future dates.
 
 ## Getting Started
 
-- Run `npm install countdown-time --save`
-- Add an import to the npm packages `import countdown-time;`
-- Then you can use the element anywhere in your template, JSX, html etc
+- Run `npm i @wanoo21/countdown-time`
+- Add an import to the npm packages `import '@wanoo21/countdown-time;`
+- Then you can use the element anywhere in your template, JSX, html etc as `<countdown-time autostart add="1h 30m"></countdown-time>`
 
 ## Properties
 
