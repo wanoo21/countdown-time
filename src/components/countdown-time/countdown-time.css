@@ -1,0 +1,11 @@
+countdown-time {
+  display: block;
+}
+countdown-time:not(.expired) [show-on-expired],
+countdown-time:not(.started) [hide-on-expired] {
+  display: none;
+}
+countdown-time.expired [show-on-expired],
+countdown-time.started [hide-on-expired] {
+  display: block !important;
+}

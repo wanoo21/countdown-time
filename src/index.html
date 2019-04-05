@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <title>Countdown time Web Component</title>
+    <script src="/build/countdown-time.js"></script>
+  </head>
+  <body>
+    <style>
+      countdown-time {
+        padding: 30px;
+        font-size: 3rem;
+        border: 1px solid red;
+      }
+      countdown-time p {
+        margin: 0;
+      }
+    </style>
+    <countdown-time autostart add="6s" format="{s}">
+      <p show-on-expired>
+        Access to some private text after expiring.
+      </p>
+      <p hide-on-expired>Please wait 1 minute ...</p>
+    </countdown-time>
+    <script>
+      const countdownTime = document.querySelector('countdown-time');
+      countdownTime.addEventListener('ready', async function(ev) {
+        // setTimeout(() => {
+        //   countdownTime.restart();
+        // }, 3000);
+        //   // countdownTime.autostart = true;
+        console.dir(countdownTime);
+        console.log(await countdownTime.getCountDownTime());
+        //   // ev.target.start();
+      });
+    </script>
+  </body>
+</html>
