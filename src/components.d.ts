@@ -37,7 +37,7 @@ export namespace Components {
     */
     'getCountDownTime': () => Promise<ITimeObject>;
     /**
-    * Restart countdown manually
+    * Restart countdown manually.
     */
     'restart': () => Promise<void>;
     /**
@@ -45,11 +45,11 @@ export namespace Components {
     */
     'setAsExpired': () => Promise<void>;
     /**
-    * Start countdown manually
+    * Start countdown manually.
     */
     'start': () => Promise<void>;
     /**
-    * Stop countdown manually
+    * Stop countdown manually.
     */
     'stop': () => Promise<void>;
   }
@@ -71,11 +71,15 @@ export namespace Components {
     */
     'format'?: string;
     /**
-    * Emit when countdown expires
+    * Emit each time when it changes.
+    */
+    'onChange'?: (event: CustomEvent) => void;
+    /**
+    * Emit when countdown expires.
     */
     'onExpire'?: (event: CustomEvent) => void;
     /**
-    * Emit when countdown is ready to start
+    * Emit when countdown is ready to start.
     */
     'onReady'?: (event: CustomEvent) => void;
   }

@@ -23,13 +23,17 @@ export class CountDownTime {
   @Element() el: HTMLElement;
 
   /**
-   * Emit when countdown expires
+   * Emit when countdown expires.
    */
   @Event() expire: EventEmitter;
   /**
-   * Emit when countdown is ready to start
+   * Emit when countdown is ready to start.
    */
   @Event() ready: EventEmitter;
+  /**
+   * Emit each time when it changes.
+   */
+  @Event() change: EventEmitter;
 
   /**
    * Datetime to countdown, must be a valid date
@@ -68,7 +72,7 @@ export class CountDownTime {
   }
 
   /**
-   * Start countdown manually
+   * Start countdown manually.
    */
   @Method() async start() {
     this.setState({ started: true });
@@ -79,7 +83,7 @@ export class CountDownTime {
     await Promise.resolve();
   }
   /**
-   * Stop countdown manually
+   * Stop countdown manually.
    */
   @Method() async stop() {
     this.setState({ started: false });
@@ -88,7 +92,7 @@ export class CountDownTime {
     }
   }
   /**
-   * Restart countdown manually
+   * Restart countdown manually.
    */
   @Method() async restart() {
     if (this.state.started) {
@@ -177,15 +181,13 @@ export class CountDownTime {
   async componentDidUnload() {
     await this.stop();
   }
-  // async componentDidUpdate() {
-  //   console.log('Update');
-  //   await this.restart();
-  // }
+  componentDidUpdate() {
+    this.change.emit();
+  }
 
   hostData() {
-    const { started, expired } = this.state;
     return {
-      class: { started, expired }
+      class: this.state
     };
   }
   render() {
