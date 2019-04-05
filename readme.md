@@ -12,23 +12,25 @@ Create a flexible and powerfull countdown to any future dates.
 
 ## Properties
 
-| Property    | Attribute   | Description | Type      | Default               |
-| ----------- | ----------- | ----------- | --------- | --------------------- |
-| `add`       | `add`       |             | `string`  | `undefined`           |
-| `autostart` | `autostart` |             | `boolean` | `false`               |
-| `datetime`  | `datetime`  |             | `string`  | `this.now.toString()` |
-| `format`    | `format`    |             | `string`  | `'{d}d, {h}:{m}:{s}'` |
+| Property    | Attribute   | Description                                                                       | Type      | Default                 |
+| ----------- | ----------- | --------------------------------------------------------------------------------- | --------- | ----------------------- |
+| `add`       | `add`       | Add more time to current datetime separated by spaces, ex: add="1h 30m"           | `string`  | `undefined`             |
+| `autostart` | `autostart` | Whether start or not when countdown is ready, if not, you must start it manually. | `boolean` | `false`                 |
+| `datetime`  | `datetime`  | Datetime to countdown, must be a valid date                                       | `string`  | `new Date().toString()` |
+| `format`    | `format`    | Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.               | `string`  | `'{d}d, {h}:{m}:{s}'`   |
 
 ## Events
 
-| Event    | Description | Type                |
-| -------- | ----------- | ------------------- |
-| `expire` |             | `CustomEvent<void>` |
-| `ready`  |             | `CustomEvent<void>` |
+| Event    | Description                           | Type                |
+| -------- | ------------------------------------- | ------------------- |
+| `expire` | Emit when countdown expires           | `CustomEvent<void>` |
+| `ready`  | Emit when countdown is ready to start | `CustomEvent<void>` |
 
 ## Methods
 
 ### `getCountDownTime() => Promise<ITimeObject>`
+
+Get countdown time as object.
 
 #### Returns
 
@@ -36,11 +38,15 @@ Type: `Promise<ITimeObject>`
 
 ### `restart() => Promise<void>`
 
+Restart countdown manually
+
 #### Returns
 
 Type: `Promise<void>`
 
 ### `setAsExpired() => Promise<void>`
+
+Set as expired manually, it'll stop and do everything as expired.
 
 #### Returns
 
@@ -48,14 +54,16 @@ Type: `Promise<void>`
 
 ### `start() => Promise<void>`
 
+Start countdown manually
+
 #### Returns
 
 Type: `Promise<void>`
 
 ### `stop() => Promise<void>`
 
+Stop countdown manually
+
 #### Returns
 
 Type: `Promise<void>`
-
----
