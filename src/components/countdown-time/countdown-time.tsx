@@ -18,18 +18,35 @@ import { IState, ITimeObject } from '../../interfaces';
 })
 export class CountDownTime {
   interval: number;
-  now: Date = new Date();
   showOnExpiredElement: HTMLElement;
 
   @Element() el: HTMLElement;
 
+  /**
+   * Emit when countdown expires
+   */
   @Event() expire: EventEmitter;
+  /**
+   * Emit when countdown is ready to start
+   */
   @Event() ready: EventEmitter;
 
+  /**
+   * Datetime to countdown, must be a valid date
+   */
   @Prop({ mutable: true, reflectToAttr: true })
-  datetime: string = this.now.toString();
+  datetime: string = new Date().toString();
+  /**
+   * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
+   */
   @Prop({ reflectToAttr: true }) format: string = '{d}d, {h}:{m}:{s}';
+  /**
+   * Add more time to current datetime separated by spaces, ex: add="1h 30m"
+   */
   @Prop({ reflectToAttr: true }) add: string;
+  /**
+   * Whether start or not when countdown is ready, if not, you must start it manually.
+   */
   @Prop({ reflectToAttr: true }) autostart: boolean = false;
 
   @State() state: IState = {
@@ -50,6 +67,9 @@ export class CountDownTime {
     }
   }
 
+  /**
+   * Start countdown manually
+   */
   @Method() async start() {
     this.setState({ started: true });
     this.interval = setInterval(
@@ -58,24 +78,36 @@ export class CountDownTime {
     );
     await Promise.resolve();
   }
+  /**
+   * Stop countdown manually
+   */
   @Method() async stop() {
     this.setState({ started: false });
     if (this.interval) {
       await clearInterval(this.interval);
     }
   }
+  /**
+   * Restart countdown manually
+   */
   @Method() async restart() {
     if (this.state.started) {
       await this.stop();
     }
     await this.start();
   }
+  /**
+   * Set as expired manually, it'll stop and do everything as expired.
+   */
   @Method() async setAsExpired() {
     this.setState({ expired: true });
     this.expire.emit();
     await this.stop();
     this.showOnExpiredElement && this.el.appendChild(this.showOnExpiredElement);
   }
+  /**
+   * Get countdown time as object.
+   */
   @Method() async getCountDownTime() {
     return this.timeObject;
   }

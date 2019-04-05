@@ -16,22 +16,67 @@ import {
 export namespace Components {
 
   interface CountdownTime {
+    /**
+    * Add more time to current datetime separated by spaces, ex: add="1h 30m"
+    */
     'add': string;
+    /**
+    * Whether start or not when countdown is ready, if not, you must start it manually.
+    */
     'autostart': boolean;
+    /**
+    * Datetime to countdown, must be a valid date
+    */
     'datetime': string;
+    /**
+    * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
+    */
     'format': string;
+    /**
+    * Get countdown time as object.
+    */
     'getCountDownTime': () => Promise<ITimeObject>;
+    /**
+    * Restart countdown manually
+    */
     'restart': () => Promise<void>;
+    /**
+    * Set as expired manually, it'll stop and do everything as expired.
+    */
     'setAsExpired': () => Promise<void>;
+    /**
+    * Start countdown manually
+    */
     'start': () => Promise<void>;
+    /**
+    * Stop countdown manually
+    */
     'stop': () => Promise<void>;
   }
   interface CountdownTimeAttributes extends StencilHTMLAttributes {
+    /**
+    * Add more time to current datetime separated by spaces, ex: add="1h 30m"
+    */
     'add'?: string;
+    /**
+    * Whether start or not when countdown is ready, if not, you must start it manually.
+    */
     'autostart'?: boolean;
+    /**
+    * Datetime to countdown, must be a valid date
+    */
     'datetime'?: string;
+    /**
+    * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
+    */
     'format'?: string;
+    /**
+    * Emit when countdown expires
+    */
     'onExpire'?: (event: CustomEvent) => void;
+    /**
+    * Emit when countdown is ready to start
+    */
     'onReady'?: (event: CustomEvent) => void;
   }
 }
