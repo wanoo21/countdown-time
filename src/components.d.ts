@@ -27,7 +27,7 @@ export namespace Components {
     /**
     * Datetime to countdown, must be a valid date
     */
-    'datetime': string;
+    'datetime': string | number;
     /**
     * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
     */
@@ -52,6 +52,10 @@ export namespace Components {
     * Stop countdown manually.
     */
     'stop': () => Promise<void>;
+    /**
+    * Convert date to UTC
+    */
+    'utc': boolean;
   }
   interface CountdownTimeAttributes extends StencilHTMLAttributes {
     /**
@@ -65,7 +69,7 @@ export namespace Components {
     /**
     * Datetime to countdown, must be a valid date
     */
-    'datetime'?: string;
+    'datetime'?: string | number;
     /**
     * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
     */
@@ -82,6 +86,10 @@ export namespace Components {
     * Emit when countdown is ready to start.
     */
     'onReady'?: (event: CustomEvent) => void;
+    /**
+    * Convert date to UTC
+    */
+    'utc'?: boolean;
   }
 }
 

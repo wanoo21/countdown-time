@@ -39,11 +39,11 @@ export class CountDownTime {
    * Datetime to countdown, must be a valid date
    */
   @Prop({ mutable: true, reflectToAttr: true })
-  datetime: string = new Date().toString();
+  datetime: string | number = Date.now();
   /**
    * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
    */
-  @Prop({ reflectToAttr: true }) format: string = '{d}d, {h}:{m}:{s}';
+  @Prop({ reflectToAttr: true }) format = '{h}:{m}:{s}';
   /**
    * Add more time to current datetime separated by spaces, ex: add="1h 30m"
    */
@@ -51,7 +51,18 @@ export class CountDownTime {
   /**
    * Whether start or not when countdown is ready, if not, you must start it manually.
    */
-  @Prop({ reflectToAttr: true }) autostart: boolean = false;
+  @Prop({ reflectToAttr: true }) autostart = false;
+  /**
+   * Convert date to UTC
+   */
+  @Prop({ reflectToAttr: true }) utc = false;
+
+  get convertedDateTime() {
+    if (this.utc) {
+      return this.convertToUTCDate(this.datetime);
+    }
+    return new Date(+this.datetime || this.datetime).getTime();
+  }
 
   @State() state: IState = {
     started: false,
@@ -116,13 +127,30 @@ export class CountDownTime {
     return this.timeObject;
   }
 
+  convertToUTCDate(date: number | string) {
+    const datetime = new Date(+date || date);
+    return Date.UTC(
+      datetime.getFullYear(),
+      datetime.getMonth(),
+      datetime.getDate(),
+      datetime.getHours(),
+      datetime.getMinutes(),
+      datetime.getSeconds(),
+      datetime.getMilliseconds()
+    );
+  }
+
   async setState(newState: IState) {
     this.state = { ...this.state, ...newState };
     return Promise.resolve();
   }
   async calculateCountDown() {
     const { day, hour, minute, second } = numberTimes;
-    const distance = new Date(this.datetime).getTime() - new Date().getTime();
+    let now = Date.now();
+    if (this.utc) {
+      now = this.convertToUTCDate(now);
+    }
+    const distance = this.convertedDateTime - now;
     if (distance < 0) {
       await this.setAsExpired();
       return;
@@ -148,7 +176,7 @@ export class CountDownTime {
     return Promise.resolve();
   }
   getDateTimeAttr() {
-    return new Date(this.datetime).toJSON().substring(0, 19);
+    return new Date(this.convertedDateTime).toJSON().substring(0, 19);
   }
   getFormattedTime() {
     const { days, hours, minutes, seconds } = this.timeObject;
@@ -157,7 +185,7 @@ export class CountDownTime {
       if (match === '{h}') return hours;
       if (match === '{m}') return minutes;
       if (match === '{s}') return seconds;
-      return '';
+      return match;
     });
   }
 

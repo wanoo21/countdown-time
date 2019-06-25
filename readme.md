@@ -7,17 +7,20 @@ Create a flexible and powerfull countdown to any future dates.
 ## Getting Started
 
 - Run `npm i @wanoo21/countdown-time`
-- Add an import to the npm packages `import '@wanoo21/countdown-time;`
+- Add an import to the npm packages `import '@wanoo21/countdown-time';`
 - Then you can use the element anywhere in your template, JSX, html etc as `<countdown-time autostart add="1h 30m"></countdown-time>`
+
+Read more about this [Countdown Web Component](https://yon.fun/simple-and-powerful-countdown-in-js/).
 
 ## Properties
 
-| Property    | Attribute   | Description                                                                       | Type      | Default                 |
-| ----------- | ----------- | --------------------------------------------------------------------------------- | --------- | ----------------------- |
-| `add`       | `add`       | Add more time to current datetime separated by spaces, ex: add="1h 30m"           | `string`  | `undefined`             |
-| `autostart` | `autostart` | Whether start or not when countdown is ready, if not, you must start it manually. | `boolean` | `false`                 |
-| `datetime`  | `datetime`  | Datetime to countdown, must be a valid date                                       | `string`  | `new Date().toString()` |
-| `format`    | `format`    | Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.               | `string`  | `'{d}d, {h}:{m}:{s}'`   |
+| Property    | Attribute   | Description                                                                      | Type              | Default         |
+| ----------- | ----------- | -------------------------------------------------------------------------------- | ----------------- | --------------- |
+| `add`       | `add`       | Add more time to current datetime separated by spaces, ex: add="1h 30m"          | `string`          | `undefined`     |
+| `autostart` | `autostart` | Whether start or not when countdown is ready, if not, you must start it manually | `boolean`         | `false`         |
+| `datetime`  | `datetime`  | Datetime to countdown, must be a valid date                                      | `string | number` | `Date.now()`    |
+| `format`    | `format`    | Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.              | `string`          | `'{h}:{m}:{s}'` |
+| `utc`       | `utc`       | Convert date to UTC                                                              | `string`          | `false`         |
 
 ## Events
 
