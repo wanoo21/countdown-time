@@ -19,8 +19,8 @@ Read more about this [Countdown Web Component](https://yon.fun/simple-and-powerf
 | `add`       | `add`       | Add more time to current datetime separated by spaces, ex: add="1h 30m"          | `string`          | `undefined`     |
 | `autostart` | `autostart` | Whether start or not when countdown is ready, if not, you must start it manually | `boolean`         | `false`         |
 | `datetime`  | `datetime`  | Datetime to countdown, must be a valid date                                      | `string | number` | `Date.now()`    |
-| `format`    | `format`    | Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.              | `string`          | `'{h}:{m}:{s}'` |
-| `utc`       | `utc`       | Convert date to UTC                                                              | `string`          | `false`         |
+| `format`    | `format`    | Showing format, {w} = weeks, {d} = days, {h} hours, {m} minutes and {s} seconds. | `string`          | `'{h}:{m}:{s}'` |
+| `utc`       | `utc`       | Convert date to UTC                                                              | `boolean`         | `false`         |
 
 ## Events
 
