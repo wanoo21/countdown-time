@@ -69,6 +69,7 @@ export class CountDownTime {
     expired: false
   };
   @State() timeObject: ITimeObject = {
+    weeks: '0',
     days: '0',
     hours: '00',
     minutes: '00',
@@ -145,7 +146,7 @@ export class CountDownTime {
     return Promise.resolve();
   }
   async calculateCountDown() {
-    const { day, hour, minute, second } = numberTimes;
+    const { week, day, hour, minute, second } = numberTimes;
     let now = Date.now();
     if (this.utc) {
       now = this.convertToUTCDate(now);
@@ -159,7 +160,8 @@ export class CountDownTime {
     const minutes = Math.floor((distance % hour) / minute);
     const seconds = Math.floor((distance % minute) / second);
     this.timeObject = {
-      days: `${Math.floor(distance / day)}`,
+      weeks: `${Math.floor(distance / week)}`,
+      days: `${Math.floor((distance % week) / day)}`,
       hours: hours < 10 ? `0${hours}` : `${hours}`,
       minutes: minutes < 10 ? `0${minutes}` : `${minutes}`,
       seconds: seconds < 10 ? `0${seconds}` : `${seconds}`
@@ -167,20 +169,24 @@ export class CountDownTime {
     return Promise.resolve();
   }
   async addMoreTime() {
-    let date = new Date(this.datetime);
-    this.add.split(' ').forEach((time: string) => {
-      const [, count, period] = time.match(/(\d+)(\w+)/);
-      date = new Date(date.getTime() + +count * periodTimes[period]);
-    });
-    this.datetime = date.toString();
+    let date = new Date(this.convertedDateTime);
+    this.add
+      .trim()
+      .split(' ')
+      .forEach((time: string) => {
+        const [, count, period] = time.match(/(\d+)(\w+)/);
+        date = new Date(date.getTime() + +count * periodTimes[period]);
+      });
+    this.datetime = date.getTime();
     return Promise.resolve();
   }
   getDateTimeAttr() {
     return new Date(this.convertedDateTime).toJSON().substring(0, 19);
   }
   getFormattedTime() {
-    const { days, hours, minutes, seconds } = this.timeObject;
+    const { weeks, days, hours, minutes, seconds } = this.timeObject;
     return this.format.replace(/({\w{1,}})/g, (match: string) => {
+      if (match === '{w}') return weeks;
       if (match === '{d}') return days;
       if (match === '{h}') return hours;
       if (match === '{m}') return minutes;
