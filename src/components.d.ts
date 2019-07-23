@@ -28,9 +28,6 @@ export namespace Components {
     * Datetime to countdown, must be a valid date
     */
     'datetime': string | number;
-    /**
-    * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
-    */
     'format': string;
     /**
     * Get countdown time as object.
@@ -70,9 +67,6 @@ export namespace Components {
     * Datetime to countdown, must be a valid date
     */
     'datetime'?: string | number;
-    /**
-    * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
-    */
     'format'?: string;
     /**
     * Emit each time when it changes.

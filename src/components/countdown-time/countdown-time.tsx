@@ -19,6 +19,8 @@ import { IState, ITimeObject } from '../../interfaces';
 export class CountDownTime {
   interval: number;
   showOnExpiredElement: HTMLElement;
+  predefinedSlot: HTMLElement;
+  predefinedSlotHTML: string;
 
   @Element() el: HTMLElement;
 
@@ -41,9 +43,10 @@ export class CountDownTime {
   @Prop({ mutable: true, reflectToAttr: true })
   datetime: string | number = Date.now();
   /**
+   * @deprecated
    * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
    */
-  @Prop({ reflectToAttr: true }) format = '{h}:{m}:{s}';
+  @Prop({ reflectToAttr: false }) format = '{h}:{m}:{s}';
   /**
    * Add more time to current datetime separated by spaces, ex: add="1h 30m"
    */
@@ -51,7 +54,7 @@ export class CountDownTime {
   /**
    * Whether start or not when countdown is ready, if not, you must start it manually.
    */
-  @Prop({ reflectToAttr: true }) autostart = false;
+  @Prop({ reflectToAttr: true }) autostart = true;
   /**
    * Convert date to UTC
    */
@@ -79,7 +82,7 @@ export class CountDownTime {
   @Watch('datetime') validateDate(newValue: string, oldValue: string) {
     if (isNaN(new Date(newValue).valueOf())) {
       this.datetime = oldValue;
-      throw new Error('Invalid date was provided, fallback to old value.');
+      // throw new Error('Invalid date was provided, fallback to old value.');
     }
   }
 
@@ -88,10 +91,9 @@ export class CountDownTime {
    */
   @Method() async start() {
     this.setState({ started: true });
-    this.interval = setInterval(
-      async () => await this.calculateCountDown(),
-      1000
-    );
+    this.interval = setInterval(async () => {
+      await this.calculateCountDown(), this.checkAndReplaceSlotInnerHtml();
+    }, 1000);
     await Promise.resolve();
   }
   /**
@@ -128,7 +130,7 @@ export class CountDownTime {
     return this.timeObject;
   }
 
-  convertToUTCDate(date: number | string) {
+  private convertToUTCDate(date: number | string) {
     const datetime = new Date(+date || date);
     return Date.UTC(
       datetime.getFullYear(),
@@ -139,6 +141,26 @@ export class CountDownTime {
       datetime.getSeconds(),
       datetime.getMilliseconds()
     );
+  }
+
+  private checkAndReplaceSlotInnerHtml() {
+    if (this.predefinedSlot) {
+      this.predefinedSlot.innerHTML = this.replaceDateTimePlaceholders(
+        this.predefinedSlotHTML
+      );
+    }
+  }
+
+  private replaceDateTimePlaceholders(html: string) {
+    const { weeks, days, hours, minutes, seconds } = this.timeObject;
+    return html.replace(/({\w{1,}})/g, (match: string) => {
+      if (match === '{w}') return weeks;
+      if (match === '{d}') return days;
+      if (match === '{h}') return hours;
+      if (match === '{m}') return minutes;
+      if (match === '{s}') return seconds;
+      return match;
+    });
   }
 
   async setState(newState: IState) {
@@ -166,7 +188,7 @@ export class CountDownTime {
       minutes: minutes < 10 ? `0${minutes}` : `${minutes}`,
       seconds: seconds < 10 ? `0${seconds}` : `${seconds}`
     };
-    return Promise.resolve();
+    return Promise.resolve(this.timeObject);
   }
   async addMoreTime() {
     let date = new Date(this.convertedDateTime);
@@ -183,22 +205,19 @@ export class CountDownTime {
   getDateTimeAttr() {
     return new Date(this.convertedDateTime).toJSON().substring(0, 19);
   }
-  getFormattedTime() {
-    const { weeks, days, hours, minutes, seconds } = this.timeObject;
-    return this.format.replace(/({\w{1,}})/g, (match: string) => {
-      if (match === '{w}') return weeks;
-      if (match === '{d}') return days;
-      if (match === '{h}') return hours;
-      if (match === '{m}') return minutes;
-      if (match === '{s}') return seconds;
-      return match;
-    });
-  }
+  // getFormattedTime() {
+  //   this.checkAndReplaceSlotInnerHtml();
+  //   return ;
+  // }
 
   async componentWillLoad() {
     this.showOnExpiredElement = this.el.querySelector('[show-on-expired]');
     if (this.showOnExpiredElement) {
       this.showOnExpiredElement.remove();
+    }
+    if (this.el.querySelector('[slot]')) {
+      this.predefinedSlot = this.el.querySelector('[slot]');
+      this.predefinedSlotHTML = this.predefinedSlot.innerHTML;
     }
   }
 
@@ -208,6 +227,7 @@ export class CountDownTime {
       await this.addMoreTime();
     }
     await this.calculateCountDown();
+    this.checkAndReplaceSlotInnerHtml();
     if (this.autostart) {
       await this.restart();
     }
@@ -224,11 +244,14 @@ export class CountDownTime {
       class: this.state
     };
   }
+
   render() {
-    if (!this.state.expired) {
-      return (
-        <time dateTime={this.getDateTimeAttr()}>{this.getFormattedTime()}</time>
-      );
-    }
+    return (
+      <slot>
+        <time dateTime={this.getDateTimeAttr()}>
+          {this.replaceDateTimePlaceholders(this.format)}
+        </time>
+      </slot>
+    );
   }
 }
