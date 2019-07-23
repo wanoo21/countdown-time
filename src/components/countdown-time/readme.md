@@ -8,7 +8,7 @@
 | Property    | Attribute   | Description                                                                       | Type               | Default         |
 | ----------- | ----------- | --------------------------------------------------------------------------------- | ------------------ | --------------- |
 | `add`       | `add`       | Add more time to current datetime separated by spaces, ex: add="1h 30m"           | `string`           | `undefined`     |
-| `autostart` | `autostart` | Whether start or not when countdown is ready, if not, you must start it manually. | `boolean`          | `true`          |
+| `autostart` | `autostart` | Whether start or not when countdown is ready, if not, you must start it manually. | `boolean`          | `false`         |
 | `datetime`  | `datetime`  | Datetime to countdown, must be a valid date                                       | `number \| string` | `Date.now()`    |
 | `format`    | `format`    |                                                                                   | `string`           | `'{h}:{m}:{s}'` |
 | `utc`       | `utc`       | Convert date to UTC                                                               | `boolean`          | `false`         |

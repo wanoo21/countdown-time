@@ -54,7 +54,7 @@ export class CountDownTime {
   /**
    * Whether start or not when countdown is ready, if not, you must start it manually.
    */
-  @Prop({ reflectToAttr: true }) autostart = true;
+  @Prop({ reflectToAttr: true }) autostart = false;
   /**
    * Convert date to UTC
    */
