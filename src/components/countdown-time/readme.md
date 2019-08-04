@@ -9,7 +9,7 @@
 | ----------- | ----------- | --------------------------------------------------------------------------------- | ------------------ | --------------- |
 | `add`       | `add`       | Add more time to current datetime separated by spaces, ex: add="1h 30m"           | `string`           | `undefined`     |
 | `autostart` | `autostart` | Whether start or not when countdown is ready, if not, you must start it manually. | `boolean`          | `false`         |
-| `datetime`  | `datetime`  | Datetime to countdown, must be a valid date                                       | `number \| string` | `Date.now()`    |
+| `datetime`  | `datetime`  | Datetime to countdown, must be a valid date                                       | `number \| string` | `null`          |
 | `format`    | `format`    |                                                                                   | `string`           | `'{h}:{m}:{s}'` |
 | `utc`       | `utc`       | Convert date to UTC                                                               | `boolean`          | `false`         |
 
@@ -55,19 +55,19 @@ Type: `Promise<void>`
 
 
 
-### `start() => Promise<void>`
+### `start() => Promise<number>`
 
 Start countdown manually.
 
 #### Returns
 
-Type: `Promise<void>`
+Type: `Promise<number>`
 
 
 
 ### `stop() => Promise<void>`
 
-Stop countdown manually.
+Stop/Pause countdown manually.
 
 #### Returns
 

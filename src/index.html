@@ -20,12 +20,18 @@
         margin: 0;
       }
     </style>
-    <countdown-time add="10s">
+    <countdown-time add="1h 10s">
       <div slot>
+        <strong>{d} days</strong>
+        <strong>{h} hours</strong>
         <strong>{m} minutes</strong>
         <del>{s} seconds</del>
       </div>
     </countdown-time>
+
+    <button onclick="countdownTime.start()">Start</button>
+    <button onclick="countdownTime.stop()">Stop</button>
+    <button onclick="countdownTime.restart()">Restart</button>
     <script>
       const countdownTime = document.querySelector('countdown-time');
       countdownTime.addEventListener('change', async function(ev) {

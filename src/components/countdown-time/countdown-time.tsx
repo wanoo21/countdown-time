@@ -23,7 +23,6 @@ export class CountDownTime {
   predefinedSlotHTML: string;
 
   @Element() el: HTMLElement;
-
   /**
    * Emit when countdown expires.
    */
@@ -41,7 +40,7 @@ export class CountDownTime {
    * Datetime to countdown, must be a valid date
    */
   @Prop({ mutable: true, reflectToAttr: true })
-  datetime: string | number = Date.now();
+  datetime: string | number = null;
   /**
    * @deprecated
    * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
@@ -60,12 +59,8 @@ export class CountDownTime {
    */
   @Prop({ reflectToAttr: true }) utc = false;
 
-  get convertedDateTime() {
-    if (this.utc) {
-      return this.convertToUTCDate(this.datetime);
-    }
-    return new Date(+this.datetime || this.datetime).getTime();
-  }
+  private finishCounting: number;
+  private counting = 1;
 
   @State() state: IState = {
     started: false,
@@ -92,27 +87,25 @@ export class CountDownTime {
   @Method() async start() {
     this.setState({ started: true });
     this.interval = setInterval(async () => {
-      await this.calculateCountDown(), this.checkAndReplaceSlotInnerHtml();
-    }, 1000);
-    await Promise.resolve();
+      await this.runCountDown(), this.replaceSlotInnerHtml();
+    }, periodTimes.s);
+    return Promise.resolve(this.interval);
   }
   /**
-   * Stop countdown manually.
+   * Stop/Pause countdown manually.
    */
   @Method() async stop() {
-    this.setState({ started: false });
     if (this.interval) {
       await clearInterval(this.interval);
     }
+    this.setState({ started: false });
   }
   /**
    * Restart countdown manually.
    */
   @Method() async restart() {
-    if (this.state.started) {
-      await this.stop();
-    }
-    await this.start();
+    this.counting = 1;
+    await this.stop(), await this.start();
   }
   /**
    * Set as expired manually, it'll stop and do everything as expired.
@@ -130,6 +123,14 @@ export class CountDownTime {
     return this.timeObject;
   }
 
+  private setState(newState: IState) {
+    this.state = { ...this.state, ...newState };
+  }
+
+  private getDateTimeAttr() {
+    return new Date(this.finishCounting).toJSON().substring(0, 19);
+  }
+
   private convertToUTCDate(date: number | string) {
     const datetime = new Date(+date || date);
     return Date.UTC(
@@ -143,15 +144,15 @@ export class CountDownTime {
     );
   }
 
-  private checkAndReplaceSlotInnerHtml() {
+  private replaceSlotInnerHtml() {
     if (this.predefinedSlot) {
-      this.predefinedSlot.innerHTML = this.replaceDateTimePlaceholders(
+      this.predefinedSlot.innerHTML = this.replacePlaceholders(
         this.predefinedSlotHTML
       );
     }
   }
 
-  private replaceDateTimePlaceholders(html: string) {
+  private replacePlaceholders(html = this.format) {
     const { weeks, days, hours, minutes, seconds } = this.timeObject;
     return html.replace(/({\w{1,}})/g, (match: string) => {
       if (match === '{w}') return weeks;
@@ -163,21 +164,8 @@ export class CountDownTime {
     });
   }
 
-  async setState(newState: IState) {
-    this.state = { ...this.state, ...newState };
-    return Promise.resolve();
-  }
-  async calculateCountDown() {
+  private renderTimeToString(distance = this.finishCounting) {
     const { week, day, hour, minute, second } = numberTimes;
-    let now = Date.now();
-    if (this.utc) {
-      now = this.convertToUTCDate(now);
-    }
-    const distance = this.convertedDateTime - now;
-    if (distance < 0) {
-      await this.setAsExpired();
-      return;
-    }
     const hours = Math.floor((distance % day) / hour);
     const minutes = Math.floor((distance % hour) / minute);
     const seconds = Math.floor((distance % minute) / second);
@@ -188,27 +176,35 @@ export class CountDownTime {
       minutes: minutes < 10 ? `0${minutes}` : `${minutes}`,
       seconds: seconds < 10 ? `0${seconds}` : `${seconds}`
     };
-    return Promise.resolve(this.timeObject);
   }
-  async addMoreTime() {
-    let date = new Date(this.convertedDateTime);
-    this.add
-      .trim()
-      .split(' ')
-      .forEach((time: string) => {
+
+  private checkAndConvertDateTime() {
+    let time = new Date(this.datetime).getTime() || Date.now();
+    if (this.utc) {
+      time = this.convertToUTCDate(time);
+    }
+    if (this.add) {
+      let date = new Date(time);
+      const times = this.add.trim().split(' ');
+      times.forEach((time: string) => {
         const [, count, period] = time.match(/(\d+)(\w+)/);
         date = new Date(date.getTime() + +count * periodTimes[period]);
       });
-    this.datetime = date.getTime();
-    return Promise.resolve();
+      time = date.getTime() - (this.datetime ? 0 : time);
+    }
+    return time;
   }
-  getDateTimeAttr() {
-    return new Date(this.convertedDateTime).toJSON().substring(0, 19);
+
+  private async runCountDown() {
+    const minusTime = periodTimes.s * this.counting;
+    const distance = this.finishCounting - minusTime;
+    if (distance <= 0) {
+      await this.setAsExpired();
+    } else {
+      this.counting++;
+    }
+    return this.renderTimeToString(distance);
   }
-  // getFormattedTime() {
-  //   this.checkAndReplaceSlotInnerHtml();
-  //   return ;
-  // }
 
   async componentWillLoad() {
     this.showOnExpiredElement = this.el.querySelector('[show-on-expired]');
@@ -219,17 +215,14 @@ export class CountDownTime {
       this.predefinedSlot = this.el.querySelector('[slot]');
       this.predefinedSlotHTML = this.predefinedSlot.innerHTML;
     }
+    this.finishCounting = this.checkAndConvertDateTime();
   }
-
   async componentDidLoad() {
     this.ready.emit();
-    if (this.add) {
-      await this.addMoreTime();
-    }
-    await this.calculateCountDown();
-    this.checkAndReplaceSlotInnerHtml();
+    await this.renderTimeToString();
+    this.replaceSlotInnerHtml();
     if (this.autostart) {
-      await this.restart();
+      await this.start();
     }
   }
   async componentDidUnload() {
@@ -248,9 +241,13 @@ export class CountDownTime {
   render() {
     return (
       <slot>
-        <time dateTime={this.getDateTimeAttr()}>
-          {this.replaceDateTimePlaceholders(this.format)}
-        </time>
+        {this.datetime ? (
+          <time dateTime={this.getDateTimeAttr()}>
+            {this.replacePlaceholders()}
+          </time>
+        ) : (
+          this.replacePlaceholders()
+        )}
       </slot>
     );
   }

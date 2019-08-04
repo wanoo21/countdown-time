@@ -44,9 +44,9 @@ export namespace Components {
     /**
     * Start countdown manually.
     */
-    'start': () => Promise<void>;
+    'start': () => Promise<number>;
     /**
-    * Stop countdown manually.
+    * Stop/Pause countdown manually.
     */
     'stop': () => Promise<void>;
     /**
