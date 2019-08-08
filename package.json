@@ -1,6 +1,6 @@
 {
   "name": "@wanoo21/countdown-time",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Create a flexible and powerfull countdown to any future dates.",
   "module": "dist/esm/index.js",
   "main": "dist/index.js",
