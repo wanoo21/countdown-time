@@ -118,15 +118,15 @@ export class CountDownTime {
    * Restart countdown manually.
    */
   @Method() async restart() {
-    await this.stop(), await this.reDraw(), await this.start();
+    this.stop(), await this.reDraw(), await this.start();
   }
   /**
    * Set as expired manually, it'll stop and do everything as expired.
    */
-  @Method() async setAsExpired() {
+  @Method() setAsExpired() {
     this.setState({ expired: true });
     this.expire.emit();
-    await this.stop();
+    this.stop();
     this.showOnExpiredElement && this.el.appendChild(this.showOnExpiredElement);
   }
   /**
@@ -218,11 +218,11 @@ export class CountDownTime {
     return time;
   }
 
-  private async runCountDown() {
+  private runCountDown() {
     const minusTime = periodTimes.s * this.counting;
     const distance = this.finishCounting - minusTime;
     if (distance <= 0) {
-      await this.setAsExpired();
+      this.setAsExpired();
     } else {
       this.counting++;
     }
