@@ -20,18 +20,19 @@
         margin: 0;
       }
     </style>
-    <countdown-time add="1h 10s">
-      <div slot>
+    <countdown-time add="10s">
+      <!-- <div slot>
         <strong>{d} days</strong>
         <strong>{h} hours</strong>
         <strong>{m} minutes</strong>
         <del>{s} seconds</del>
-      </div>
+      </div> -->
     </countdown-time>
 
     <button onclick="countdownTime.start()">Start</button>
     <button onclick="countdownTime.stop()">Stop</button>
     <button onclick="countdownTime.restart()">Restart</button>
+    <button onclick="reDraw()">ReDraw</button>
     <script>
       const countdownTime = document.querySelector('countdown-time');
       countdownTime.addEventListener('change', async function(ev) {
@@ -39,10 +40,17 @@
         //   countdownTime.restart();
         // }, 3000);
         //   // countdownTime.autostart = true;
-        console.dir(countdownTime);
-        console.log(await countdownTime.getCountDownTime());
+        console.log(ev.detail);
+        // console.dir(countdownTime);
+        // console.log(await countdownTime.getCountDownTime());
         //   // ev.target.start();
       });
+
+      function reDraw() {
+        // countdownTime.stop();
+        countdownTime.add = '1h';
+        countdownTime.reDraw();
+      }
     </script>
   </body>
 </html>

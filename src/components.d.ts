@@ -28,11 +28,18 @@ export namespace Components {
     * Datetime to countdown, must be a valid date
     */
     'datetime': string | number;
+    /**
+    * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
+    */
     'format': string;
     /**
     * Get countdown time as object.
     */
     'getCountDownTime': () => Promise<ITimeObject>;
+    /**
+    * Re-Draw manually countdown after changing the 'add' or 'datetime' property
+    */
+    'reDraw': () => Promise<void>;
     /**
     * Restart countdown manually.
     */
@@ -48,7 +55,7 @@ export namespace Components {
     /**
     * Stop/Pause countdown manually.
     */
-    'stop': () => Promise<void>;
+    'stop': () => void;
     /**
     * Convert date to UTC
     */
@@ -67,6 +74,9 @@ export namespace Components {
     * Datetime to countdown, must be a valid date
     */
     'datetime'?: string | number;
+    /**
+    * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
+    */
     'format'?: string;
     /**
     * Emit each time when it changes.
@@ -80,6 +90,14 @@ export namespace Components {
     * Emit when countdown is ready to start.
     */
     'onReady'?: (event: CustomEvent) => void;
+    /**
+    * Emit when countdown in started.
+    */
+    'onStarted'?: (event: CustomEvent) => void;
+    /**
+    * Emit when countdown in stopped.
+    */
+    'onStopped'?: (event: CustomEvent) => void;
     /**
     * Convert date to UTC
     */

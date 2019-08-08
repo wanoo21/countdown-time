@@ -35,6 +35,14 @@ export class CountDownTime {
    * Emit each time when it changes.
    */
   @Event() change: EventEmitter;
+  /**
+   * Emit when countdown in stopped.
+   */
+  @Event() stopped: EventEmitter;
+  /**
+   * Emit when countdown in started.
+   */
+  @Event() started: EventEmitter;
 
   /**
    * Datetime to countdown, must be a valid date
@@ -42,7 +50,6 @@ export class CountDownTime {
   @Prop({ mutable: true, reflectToAttr: true })
   datetime: string | number = null;
   /**
-   * @deprecated
    * Showing format, {d} = days, {h} hours, {m} minutes and {s} seconds.
    */
   @Prop({ reflectToAttr: false }) format = '{h}:{m}:{s}';
@@ -74,11 +81,16 @@ export class CountDownTime {
     seconds: '00'
   };
 
-  @Watch('datetime') validateDate(newValue: string, oldValue: string) {
+  @Watch('datetime') async validateDate(newValue: string, oldValue: string) {
     if (isNaN(new Date(newValue).valueOf())) {
       this.datetime = oldValue;
       // throw new Error('Invalid date was provided, fallback to old value.');
     }
+    await this.reDraw();
+  }
+
+  @Watch('add') async validateAdd() {
+    await this.reDraw();
   }
 
   /**
@@ -89,23 +101,24 @@ export class CountDownTime {
     this.interval = setInterval(async () => {
       await this.runCountDown(), this.replaceSlotInnerHtml();
     }, periodTimes.s);
+    this.started.emit(this.state);
     return Promise.resolve(this.interval);
   }
   /**
    * Stop/Pause countdown manually.
    */
-  @Method() async stop() {
+  @Method() stop() {
     if (this.interval) {
-      await clearInterval(this.interval);
+      clearInterval(this.interval);
     }
     this.setState({ started: false });
+    this.stopped.emit(this.state);
   }
   /**
    * Restart countdown manually.
    */
   @Method() async restart() {
-    this.counting = 1;
-    await this.stop(), await this.start();
+    await this.stop(), await this.reDraw(), await this.start();
   }
   /**
    * Set as expired manually, it'll stop and do everything as expired.
@@ -121,6 +134,16 @@ export class CountDownTime {
    */
   @Method() async getCountDownTime() {
     return this.timeObject;
+  }
+
+  /**
+   * Re-Draw manually countdown after changing the 'add' or 'datetime' property
+   */
+  @Method() async reDraw() {
+    this.counting = 1;
+    this.finishCounting = this.checkAndConvertDateTime();
+    await this.renderTimeToString();
+    this.replaceSlotInnerHtml();
   }
 
   private setState(newState: IState) {
@@ -203,6 +226,7 @@ export class CountDownTime {
     } else {
       this.counting++;
     }
+    this.change.emit({ value: distance, max: this.finishCounting });
     return this.renderTimeToString(distance);
   }
 
@@ -215,21 +239,20 @@ export class CountDownTime {
       this.predefinedSlot = this.el.querySelector('[slot]');
       this.predefinedSlotHTML = this.predefinedSlot.innerHTML;
     }
-    this.finishCounting = this.checkAndConvertDateTime();
+    await this.reDraw();
   }
+
   async componentDidLoad() {
     this.ready.emit();
-    await this.renderTimeToString();
-    this.replaceSlotInnerHtml();
     if (this.autostart) {
       await this.start();
     }
   }
-  async componentDidUnload() {
-    await this.stop();
-  }
-  componentDidUpdate() {
-    this.change.emit();
+
+  disconnectedCallback() {
+    if (this.interval) {
+      clearInterval(this.interval);
+    }
   }
 
   hostData() {
@@ -241,13 +264,9 @@ export class CountDownTime {
   render() {
     return (
       <slot>
-        {this.datetime ? (
-          <time dateTime={this.getDateTimeAttr()}>
-            {this.replacePlaceholders()}
-          </time>
-        ) : (
-          this.replacePlaceholders()
-        )}
+        <time dateTime={this.getDateTimeAttr()}>
+          {this.replacePlaceholders()}
+        </time>
       </slot>
     );
   }
